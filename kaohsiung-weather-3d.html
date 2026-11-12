@@ -5,7 +5,9 @@
 html,body{margin:0;height:100%;overflow:hidden;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:#5a4a42}
 canvas{display:block;touch-action:none}
 #p{position:fixed;left:10px;top:10px;width:250px;max-height:calc(100% - 20px);overflow:auto;box-sizing:border-box;padding:12px;border-radius:18px;background:rgba(255,250,243,.9);box-shadow:0 6px 24px rgba(120,90,70,.18);font-size:13px}
-h1{font-size:16px;margin:0 0 8px}
+h1{font-size:16px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+#p.h{display:none}
+#pt{display:none;position:fixed;left:10px;top:10px;z-index:5;box-shadow:0 4px 14px rgba(120,90,70,.25)}
 .r{margin:6px 0}.r label{display:flex;justify-content:space-between}.r b{font-weight:600;color:#d9667a}
 input[type=range]{width:100%;accent-color:#ff9fa8}
 select,button{font:inherit;border:0;border-radius:10px;padding:5px 8px;background:#ffe3e6;color:#5a4a42;cursor:pointer}
@@ -23,7 +25,8 @@ select{width:100%}
 #bb.o{display:block}
 @media(max-width:700px){#bb{width:260px}}
 </style></head><body>
-<div id="p"><h1>🏡 高雄氣象小鎮</h1>
+<button id="pt" title="顯示設定欄">⚙ 設定</button>
+<div id="p"><h1><span>🏡 高雄氣象小鎮</span><button id="ph" title="隱藏設定欄">◀ 隱藏</button></h1>
 <div class="m"><button id="bL">即時</button><button id="bM">手動</button><button id="bR">時間軸</button></div>
 <div id="st"></div><div id="ctl"></div>
 <div class="r"><button id="play" style="width:100%">▶ 播放一天</button></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="spk" checked>顯示太陽軌跡</label><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="sol" checked>顯示夏至、冬至軌跡</label><div style="opacity:.7;margin-top:2px">虛線＝今日太陽路徑（SunCalc）；小鎮圓外為地平線</div></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="rot">自動旋轉視角</label><select id="rsp"><option value=".08">慢</option><option value=".15" selected>中</option><option value=".3">快</option></select></div></div>
@@ -688,6 +691,8 @@ function buildSolstice(){const y=new Date(midTW()+12*36e5).getUTCFullYear();
 buildSolstice();$('sol').onchange=()=>{solGrp.visible=$('sol').checked};
 {const rp=[];for(let i=0;i<=128;i++){const a=i/128*PI*2;rp.push(Math.cos(a)*DH,-1.25,Math.sin(a)*DH)}const rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.Float32BufferAttribute(rp,3));pathGrp.add(new THREE.Line(rg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.55,fog:false})))}
 $('spk').onchange=()=>{pathGrp.visible=$('spk').checked};
+$('ph').onclick=()=>{$('p').className='h';$('pt').style.display='block'};$('pt').onclick=()=>{$('p').className='';$('pt').style.display='none'};
+if(innerWidth<700)$('ph').onclick();
 $('rot').onchange=()=>{autoRot=$('rot').checked;lastTouch=-9};$('rsp').onchange=()=>{rotSp=+$('rsp').value};
 // ===== 西側港口：海、碼頭、貨櫃船、潮汐 =====
 let WY=-1.2,TD=null,TDsrc='估算',TE={mean:0,hi:{t:0,h:0},lo:{t:0,h:0},ev:[]};
