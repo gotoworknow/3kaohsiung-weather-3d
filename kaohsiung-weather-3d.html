@@ -29,7 +29,7 @@ select{width:100%}
 <div id="p"><h1><span>🏡 高雄氣象小鎮</span><button id="ph" title="隱藏設定欄">◀ 隱藏</button></h1>
 <div class="m"><button id="bL">即時</button><button id="bM">手動</button><button id="bR">時間軸</button></div>
 <div id="st"></div><div id="ctl"></div>
-<div class="r"><button id="play" style="width:100%">▶ 播放一天</button></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="spk" checked>顯示太陽軌跡</label><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="sol" checked>顯示夏至、冬至軌跡</label><div style="opacity:.7;margin-top:2px">虛線＝今日太陽路徑（SunCalc）；小鎮圓外為地平線</div></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="rot">自動旋轉視角</label><select id="rsp"><option value=".08">慢</option><option value=".15" selected>中</option><option value=".3">快</option></select></div></div>
+<div class="r"><button id="play" style="width:100%">▶ 播放一天</button></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="spk" checked>顯示太陽軌跡</label><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="sol" checked>顯示夏至、冬至軌跡</label><div style="opacity:.7;margin-top:2px">虛線＝今日太陽路徑（SunCalc）；小鎮圓外為地平線</div></div><div class="r" style="font-size:12px"><label style="justify-content:flex-start;gap:6px"><input type="checkbox" id="rot">自動旋轉視角</label><select id="rsp"><option value=".08">慢</option><option value=".15" selected>中</option><option value=".3">快</option></select></div><div class="r" style="font-size:12px"><div>港口每週行程（貨櫃船／遊艇／起重架）</div><select id="wd"><option value="auto" selected>自動（依今天）</option><option value="1">週一</option><option value="2">週二</option><option value="3">週三</option><option value="4">週四</option><option value="5">週五</option><option value="6">週六</option><option value="0">週日</option></select><div id="wdn" style="opacity:.8;margin-top:3px;line-height:1.4"></div></div></div>
 <div id="hud"></div>
 <div id="bb"><div class="pin"></div><h2 id="bbh"><span>📋 布告欄</span><span id="bba">✕</span></h2><div id="bbb"><div id="clk">00:00:00</div><div id="bbs"></div><div id="tide" style="text-align:center;font-size:12px;margin:0 0 4px"></div><div id="tideTbl" style="text-align:center;font-size:12px;line-height:1.6;margin:0 0 6px"></div><div style="height:170px;margin-top:6px"><canvas id="tc"></canvas></div><div id="cw"><canvas id="cc"></canvas></div><div style="display:flex;gap:6px;align-items:center;margin-top:8px"><button id="bbp">▶ 自動播放</button><input type="range" id="bbt" min="0" max="23.99" step=".01" style="flex:1"><button id="bbl">即時</button></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -89,7 +89,7 @@ add(new THREE.BoxGeometry(.8,1.4,.12),M(0xc98f6b),-.9,.7,1.72,house);
 add(new THREE.BoxGeometry(.9,.8,.12),winM,.9,1.5,1.72,house);add(new THREE.BoxGeometry(.9,.8,.12),winM,-.9,1.9+.1,-1.72,house);
 add(new THREE.BoxGeometry(.5,1.2,.5),M(0xe7c9a9),1.1,3.6,-.6,house);
 // 樹
-const INS=[[-8.2,6.6,1.3],[1.9,2.3,.6],[3.4,2.3,.6],[4.9,2.3,.6],[-7,-3.8,1],[-7,-5.4,.8],[-8.6,-1,1.3],[-7.15,-1.1,1.7],[7.2,7.3,.5],[.4,-1.4,1.1]],trees=[],crM=M(0x6ccb79),trM=M(0x9c6f4e);
+const INS=[[-9.7,-7.2,.5],[1.9,2.3,.6],[3.4,2.3,.6],[4.9,2.3,.6],[5.9,6.3,.6],[6.7,6.2,.6],[-8.6,-1,1.3],[-7.15,-1.1,1.7],[7.2,7.3,.5],[.4,-1.4,1.1]],trees=[],crM=M(0x6ccb79),trM=M(0x9c6f4e);
 for(let n=0,tr=0,N=4+Math.floor(Math.random()*4);n<N&&tr<400;tr++){const a=rnd(0,PI*2),d=Math.sqrt(Math.random())*9,x=Math.cos(a)*d,z=Math.sin(a)*d,sc0=rnd(.85,1.3);
  if(x<-7.4||z>1.8||(x>-5.8&&x<-.2&&z>-4.4&&z<.8))continue;
  if(INS.some(o=>Math.hypot(x-o[0],z-o[1])<o[2]+1.2*sc0)||trees.some(t=>Math.hypot(x-t.g.position.x,z-t.g.position.z)<2.5))continue;
@@ -152,19 +152,23 @@ const scarf=add(new THREE.TorusGeometry(.3,.09,8,20),M(0xe85d6f),0,.98,0,hero);s
 const umb=new THREE.Group();hero.add(umb);umb.position.set(.5,.7,.05);
 add(new THREE.CylinderGeometry(.02,.02,1.5,6),M(0x8b6b55),0,.6,0,umb);add(new THREE.ConeGeometry(.95,.45,16),M(0xff8a8a),0,1.4,0,umb);
 // 溫度計
-const th=new THREE.Group();th.position.set(-7,0,-3.8);th.rotation.y=.7;sc.add(th);
+const th=new THREE.Group();th.position.set(5.9,0,6.3);th.rotation.y=.7;sc.add(th);
 add(new THREE.BoxGeometry(.75,3.5,.12),M(0xfff6ea),0,1.75,0,th);add(new THREE.CylinderGeometry(.09,.09,2.5,12),M(0xdff3ff,{transparent:true,opacity:.6}),0,1.85,.08,th);
 const lg=new THREE.CylinderGeometry(.055,.055,1,12);lg.translate(0,.5,0);const liq=add(lg,M(0xff5d5d),0,.6,.09,th);
 add(new THREE.SphereGeometry(.17,16,12),M(0xff5d5d),0,.58,.09,th);
 const bead=add(new THREE.SphereGeometry(.09,12,10),M(0xffa84d),.2,1,.12,th);
-[-10,0,10,20,30,40,50].forEach(t=>{const y=.6+(t+10)/60*2.5;add(new THREE.BoxGeometry(.14,.03,.03),M(0x6b5a50),-.2,y,.1,th);const s=lab(t+'°',.42);s.position.set(-.52,y,.12);th.add(s)});
-const tl=lab('體感●',.5,'#e59a3d');tl.position.set(.08,3.7,.1);th.add(tl);
+[0,10,20,30,40].forEach(t=>{const y=.6+t/40*2.5;add(new THREE.BoxGeometry(.14,.03,.03),M(0x6b5a50),-.2,y,.1,th);const s=lab(t+'°',.42);s.position.set(-.52,y,.12);th.add(s)});
+const thC=document.createElement('canvas');thC.width=256;thC.height=128;const thX=thC.getContext('2d'),thT=new THREE.CanvasTexture(thC),thP=new THREE.Mesh(new THREE.PlaneGeometry(1.3,.65),new THREE.MeshBasicMaterial({map:thT,transparent:true}));thP.position.set(0,3.95,.12);th.add(thP);let thK='';
+function thDraw(){const a=(+S.temp).toFixed(1),b=(+S.app).toFixed(1),k=a+'|'+b;if(k==thK)return;thK=k;thX.clearRect(0,0,256,128);thX.fillStyle='rgba(255,250,240,.96)';thX.fillRect(4,4,248,120);thX.strokeStyle='#c89b6d';thX.lineWidth=6;thX.strokeRect(4,4,248,120);
+ thX.textAlign='center';thX.textBaseline='middle';thX.fillStyle='#e0566b';thX.font='bold 58px monospace';thX.fillText(a+'°C',128,48);thX.fillStyle='#e59a3d';thX.font='bold 30px sans-serif';thX.fillText('體感 '+b+'°C',128,98);thT.needsUpdate=true}
 // 量杯
-const gg=new THREE.Group();gg.position.set(-7,0,-5.4);gg.rotation.y=.7;sc.add(gg);
+const gg=new THREE.Group();gg.position.set(6.7,0,6.2);gg.rotation.y=.7;sc.add(gg);
 add(new THREE.CylinderGeometry(.38,.34,2.1,20,1,true),M(0xdff3ff,{transparent:true,opacity:.35,side:THREE.DoubleSide}),0,1.05,0,gg);
 const wg=new THREE.CylinderGeometry(.33,.33,1,20);wg.translate(0,.5,0);const water=add(wg,M(0x5fa8ff,{transparent:true,opacity:.85}),0,.04,0,gg);
-[0,10,20,30,40,50].forEach(m=>{const y=.04+m/50*1.95;add(new THREE.BoxGeometry(.14,.025,.025),M(0x6b5a50),.4,y,0,gg);const s=lab(m,.4);s.position.set(.72,y,0);gg.add(s)});
-const gl=lab('降雨 50mm',.5);gl.position.set(0,2.5,0);gg.add(gl);
+function labDyn(w){const c=document.createElement('canvas');c.width=128;c.height=64;const x=c.getContext('2d'),t=new THREE.CanvasTexture(c),sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));sp.scale.set(w*2,w,1);let cur='';return{sp,set(text,col){if(text==cur)return;cur=text;x.clearRect(0,0,128,64);x.font='bold 34px sans-serif';x.fillStyle=col||'#6b5a50';x.textAlign='center';x.textBaseline='middle';x.fillText(text,64,32);t.needsUpdate=true}}}
+const gTk=[0,1,2,3,4,5].map(i=>{const y=.04+i/5*1.95;add(new THREE.BoxGeometry(.14,.025,.025),M(0x6b5a50),.4,y,0,gg);const d=labDyn(.4);d.sp.position.set(.72,y,0);gg.add(d.sp);return d});
+const gl=labDyn(.55);gl.sp.position.set(0,2.55,0);gg.add(gl.sp);let gMax=5;const GL=[5,10,20,50,100,200,500];
+function gaugeFit(p){const tg=GL.find(v=>p<=v*.85)||500;if(tg>gMax)gMax=tg;else if(tg<gMax&&p<gMax*.4)gMax=tg;gTk.forEach((d,i)=>{const v=gMax*i/5;d.set(Number.isInteger(v)?String(v):v.toFixed(1))});gl.set('降雨 '+p.toFixed(1)+' mm','#2d6a8a')}
 // 風向旗
 const vane=new THREE.Group();vane.position.set(7.2,0,7.3);sc.add(vane);
 add(new THREE.CylinderGeometry(.06,.08,3.6,8),M(0xfff6ea),0,1.8,0,vane);add(new THREE.SphereGeometry(.13,10,10),M(0xffd27a),0,3.65,0,vane);
@@ -435,7 +439,7 @@ function ffUpdate(dt,w){const se=S.season=='auto'?seasonOf(mon()):S.season,n=se=
  for(let i=0;i<n;i++){const b=ffB[i];ffP[i*3]=b.x+Math.sin(tm*.4+b.p)*.8;ffP[i*3+1]=b.y+Math.sin(tm*.7+b.p*2)*.35;ffP[i*3+2]=b.z+Math.cos(tm*.35+b.p)*.8;
   const br=Math.pow(Math.max(0,Math.sin(tm*b.f+b.p)),3)*FV;ffC[i*3]=.8*br;ffC[i*3+1]=br;ffC[i*3+2]=.3*br}
  ffG.attributes.position.needsUpdate=true;ffG.attributes.color.needsUpdate=true}
-function nightUpdate(dt,w){LV+=((NIGHT?1:0)-LV)*Math.min(1,dt*2);ffUpdate(dt,w);bLamp.intensity=NIGHT?1.6:0;bBulb.material.color.set(NIGHT?0xffe08a:0xf1e6cc);hLamp.intensity=NIGHT?1.6:0;cLt.forEach(l=>{l.sp.intensity=NIGHT?2.4:0;l.beam.material.opacity=NIGHT?.13:0});shipWinM.emissiveIntensity=NIGHT?1:0;shipLs.forEach(l=>{l.g.material.opacity=NIGHT?.9:0;l.m.material.color.set(NIGHT?l.c:0x666b78)});hBulb.material.color.set(NIGHT?0xffe08a:0xf1e6cc);
+function nightUpdate(dt,w){LV+=((NIGHT?1:0)-LV)*Math.min(1,dt*2);ffUpdate(dt,w);bLamp.intensity=NIGHT?1.6:0;bBulb.material.color.set(NIGHT?0xffe08a:0xf1e6cc);hLamp.intensity=NIGHT?1.6:0;cLt.forEach(l=>{l.sp.intensity=NIGHT?2.4:0;l.beam.material.opacity=NIGHT?.13:0});shipWinM.emissiveIntensity=NIGHT?1:0;yachtWinM.emissiveIntensity=NIGHT?1:0;shipLs.forEach(l=>{l.g.material.opacity=NIGHT?.9:0;l.m.material.color.set(NIGHT?l.c:0x666b78)});hBulb.material.color.set(NIGHT?0xffe08a:0xf1e6cc);
  lamps.forEach(l=>{l.pl.intensity=1.3*LV;l.hd.material.emissiveIntensity=1.3*LV;l.gl.material.opacity=.85*LV;l.gl.visible=LV>.02});
  const k=boyK,P=boy.position,yaw=boy.rotation.y,hx=P.x+.29*Math.cos(yaw)+.21*Math.sin(yaw),hz=P.z-.29*Math.sin(yaw)+.21*Math.cos(yaw),hy=P.y+.5;
  let tx=P.x+Math.sin(yaw)*3.2,tz=P.z+Math.cos(yaw)*3.2;
@@ -603,8 +607,9 @@ function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-t0)/1e
  if(rc)rainG.attributes.position.needsUpdate=true;
  if(sc2){for(let i=0;i<sc2;i++){const q=sv[i];q.y-=q.v*dt;if(q.y<0){q.y=14;q.x=rnd(-14,14);q.z=rnd(-14,14)}sp[i*3]=q.x+Math.sin(tm+q.p)*.5+dx*wd*.02*q.y*.2;sp[i*3+1]=q.y;sp[i*3+2]=q.z}snowG.attributes.position.needsUpdate=true}
  // 儀表
- liqH+=((cl((S.temp+10)/60,0,1)*2.5)-liqH)*.08;beadH+=((cl((S.app+10)/60,0,1)*2.5)-beadH)*.08;liq.scale.y=Math.max(.01,liqH);bead.position.y=.6+beadH;
- wat+=((cl(S.precip/50,0,1)*1.95)-wat)*.08;water.scale.y=Math.max(.001,wat);water.visible=wat>.01;
+ liqH+=((cl(S.temp/40,0,1)*2.5)-liqH)*.08;beadH+=((cl(S.app/40,0,1)*2.5)-beadH)*.08;liq.scale.y=Math.max(.01,liqH);bead.position.y=.6+beadH;thDraw();
+ gaugeFit(+S.precip);wat+=((cl(S.precip/gMax,0,1)*1.95)-wat)*.08;water.scale.y=Math.max(.001,wat);water.visible=wat>.01;
+ {const cx=cam.position.x,cz=cam.position.z;th.rotation.y=Math.atan2(cx-th.position.x,cz-th.position.z);gg.rotation.y=Math.atan2(cx-gg.position.x,cz-gg.position.z)}
  // 小人
  heroUpdate(dt,w);
  umb.visible=!!(w.r||w.s)||S.precip>.2;scarf.visible=S.temp<20||snowF>0;
@@ -732,6 +737,18 @@ const shipSt=[],yardSt=[];
 for(let i=0;i<6;i++)for(let a=-1;a<=1;a++){const st={kind:'ship',lx:a*.72,lz:-2.8+i*.95,list:[]},h=Math.floor(Math.random()*4);for(let l=0;l<h;l++){const c=mkC();c.position.set(st.lx,.95+l*.47,st.lz);ship.add(c);st.list.push(c)}shipSt.push(st)}
 add(new THREE.BoxGeometry(1,.03,4.3),M(0x9aa0a8),-7.15,.015,-1.1).castShadow=false;
 [-2.6,-1.6,-.6,.4].forEach(z=>{const st={kind:'yard',x:-7.15,z,list:[]},h=Math.floor(Math.random()*3);for(let l=0;l<h;l++){const c=mkC();c.position.set(st.x,.23+l*.47,z);sc.add(c);st.list.push(c)}yardSt.push(st)});
+// 白色雙層觀光遊艇（週六、週日取代貨櫃船）
+const yachtWinM=M(0x2b4a7a,{emissive:0xffd27a,emissiveIntensity:0});
+const yacht=new THREE.Group();yacht.position.set(-17.5,0,0);yacht.visible=false;sc.add(yacht);
+{const sh=new THREE.Shape();[[-1,-3.2],[1,-3.2],[1,1.8],[0,3.4],[-1,1.8]].forEach((q,i)=>i?sh.lineTo(q[0],q[1]):sh.moveTo(q[0],q[1]));
+ const g=new THREE.ExtrudeGeometry(sh,{depth:1,bevelEnabled:false});g.rotateX(-PI/2);g.translate(0,-.5,0);const wh=M(0xf8f8f8);add(g,[M(0xe4eaee),wh],0,0,0,yacht);
+ [-1,1].forEach(x=>add(new THREE.BoxGeometry(.04,.1,4.6),M(0x2d6a8a),x*1.005,.05,-.1,yacht));
+ add(new THREE.BoxGeometry(1.7,.7,4),wh,0,.85,.4,yacht);add(new THREE.BoxGeometry(1.74,.28,3.6),yachtWinM,0,.9,.4,yacht);
+ add(new THREE.BoxGeometry(1.5,.6,2.6),wh,0,1.5,.2,yacht);add(new THREE.BoxGeometry(1.54,.24,2.3),yachtWinM,0,1.55,.2,yacht);
+ add(new THREE.BoxGeometry(1.7,.08,3),M(0x7ec8ff),0,1.85,.2,yacht);
+ [-1.2,1.6].forEach(z=>[-.7,.7].forEach(x=>add(new THREE.CylinderGeometry(.03,.03,.35,5),M(0xdadde2),x,2.05,z,yacht)));
+ add(new THREE.CylinderGeometry(.02,.02,.8,5),M(0xdadde2),0,2.3,.2,yacht);add(new THREE.BoxGeometry(.34,.2,.02),M(0xe0566b),.18,2.6,.2,yacht);
+ [-1.9,-2.3,-2.7].forEach(z=>{const hw=(z+3.4)/1.6-.06;[-hw,hw].forEach(x=>add(new THREE.CylinderGeometry(.02,.02,.3,5),M(0xdadde2),x,.65,z,yacht))})}
 // 起重架（沿碼頭 z 方向行走，台車沿吊臂 x 方向移動）
 const crane=new THREE.Group();crane.position.set(-8.6,0,-1);sc.add(crane);
 const craneM=M(0xe8663d),dkM=M(0x4b4f5c);
@@ -744,17 +761,25 @@ const cLt=[[-2.8,2.6],[1.35,2.2]].map(a=>{const sp=new THREE.SpotLight(0xfff2cc,
  add(new THREE.BoxGeometry(.3,.18,.34),dkM,a[0],4.28,0,crane);const lens=new THREE.Mesh(new THREE.BoxGeometry(.24,.04,.28),new THREE.MeshBasicMaterial({color:0xffffee}));lens.position.set(a[0],4.17,0);crane.add(lens);
  const bg=new THREE.ConeGeometry(1,1,16,1,true);bg.translate(0,-.5,0);const beam=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:0xfff2b0,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));beam.position.set(a[0],4.17,0);beam.scale.set(a[1]*.45,4.3,a[1]*.45);crane.add(beam);return{sp,beam}});
 const cs={st:'wait',t:2,ph:0,tx:-2.7,hy:3.3,src:null,dst:null,c:null},HT=3.3;
+let curDay=-1,craneMode='ops',shipCap=3,yardCap=3,lastV='';
+const lockLamp=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),new THREE.MeshBasicMaterial({color:0xff3030}));lockLamp.position.set(.9,5.35,0);lockLamp.visible=false;crane.add(lockLamp);
 const slotPos=(k,l)=>k.kind=='ship'?ship.localToWorld(new THREE.Vector3(k.lx,.95+l*.47,k.lz)):new THREE.Vector3(k.x,.23+l*.47,k.z);
-function craneChoose(){const sf=shipSt.filter(k=>k.list.length),yf=yardSt.filter(k=>k.list.length),sp=shipSt.filter(k=>k.list.length<3),yp=yardSt.filter(k=>k.list.length<3),r=Math.random(),pk=a=>a[Math.floor(Math.random()*a.length)];let src,dst;
- if(r<.35&&sf.length&&yp.length){src=pk(sf);dst=pk(yp)}
- else if(r<.7&&yf.length&&sp.length){src=pk(yf);dst=pk(sp)}
- else if(sf.length&&sp.length>1){src=pk(sf);dst=pk(sp.filter(k=>k!==src))}
- else if(sf.length&&yp.length){src=pk(sf);dst=pk(yp)}
- else if(yf.length&&sp.length){src=pk(yf);dst=pk(sp)}
+function craneChoose(){const pk=a=>a[Math.floor(Math.random()*a.length)];let src,dst;
+ if(craneMode=='tidy'){const ys=yardSt.filter(k=>k.list.length).sort((a,b)=>b.list.length-a.list.length),yp=yardSt.filter(k=>k.list.length<yardCap).sort((a,b)=>a.list.length-b.list.length);
+  if(!ys.length||!yp.length||ys[0].list.length-yp[0].list.length<2)return false;src=ys[0];dst=yp[0]}
+ else if(craneMode=='ops'){if(Math.abs(ship.position.x+11.3)>.2)return false;
+  const sf=shipSt.filter(k=>k.list.length),yf=yardSt.filter(k=>k.list.length),sp=shipSt.filter(k=>k.list.length<shipCap),yp=yardSt.filter(k=>k.list.length<yardCap),r=Math.random();
+  if(r<.35&&sf.length&&yp.length){src=pk(sf);dst=pk(yp)}
+  else if(r<.7&&yf.length&&sp.length){src=pk(yf);dst=pk(sp)}
+  else if(sf.length&&sp.length>1){src=pk(sf);dst=pk(sp.filter(k=>k!==src))}
+  else if(sf.length&&yp.length){src=pk(sf);dst=pk(yp)}
+  else if(yf.length&&sp.length){src=pk(yf);dst=pk(sp)}
+  else return false}
  else return false;
  cs.src=src;cs.dst=dst;cs.ph=0;cs.st='run';return true}
 function craneUpdate(dt,w){ship.updateMatrixWorld(true);
- if(cs.st=='wait'){cs.t-=dt;if(cs.t<=0){if(w.t||S.wind>45||!craneChoose())cs.t=2}}
+ if(cs.st=='wait'){cs.t-=dt;if(cs.t<=0){if(w.t||S.wind>45||!craneChoose())cs.t=2}
+  if(craneMode=='off'||craneMode=='locked'){const m=1.6*dt,tt=craneMode=='locked'?.9:-1.2;crane.position.z+=Math.max(-m,Math.min(m,-1-crane.position.z));cs.tx+=Math.max(-2*dt,Math.min(2*dt,tt-cs.tx));cs.hy=Math.min(HT,cs.hy+1.8*dt)}}
  else{const P=cs.ph;let done=false;
   if(P==0||P==4||P==8){cs.hy=Math.min(HT,cs.hy+(P==4?1.4:1.8)*dt);done=cs.hy>=HT-.01}
   else if(P==1||P==5||P==2||P==6){const k=P<4?cs.src:cs.dst,pp=slotPos(k,P<4?k.list.length-1:k.list.length),dz=pp.z-crane.position.z,dx=pp.x-crane.position.x-cs.tx;
@@ -763,12 +788,12 @@ function craneUpdate(dt,w){ship.updateMatrixWorld(true);
   else if(P==3){const c=cs.src.list.pop();cs.c=c;spr.attach(c);c.position.set(0,-.27,0);c.rotation.set(0,0,0);done=true}
   else if(P==7){const c=cs.c,k=cs.dst;if(k.kind=='ship'){ship.add(c);c.position.set(k.lx,.95+k.list.length*.47,k.lz)}else{sc.add(c);c.position.set(k.x,.23+k.list.length*.47,k.z)}c.rotation.set(0,0,0);k.list.push(c);cs.c=null;done=true}
   if(done&&++cs.ph>8){cs.st='wait';cs.t=rnd(1.5,4)}}
- trol.position.x=cs.tx;spr.position.set(cs.tx,cs.hy,0);cabs.forEach(c=>{const L=4.1-cs.hy;c.scale.y=L;c.position.set(cs.tx,cs.hy+L/2,c.position.z)})}
+ lockLamp.visible=craneMode=='locked'&&Math.sin(tm*5)>0;trol.position.x=cs.tx;spr.position.set(cs.tx,cs.hy,0);cabs.forEach(c=>{const L=4.1-cs.hy;c.scale.y=L;c.position.set(cs.tx,cs.hy+L/2,c.position.z)})}
 // 港邊潮汐公佈欄
-const hGrp=new THREE.Group();hGrp.position.set(-8.2,0,6.6);hGrp.rotation.y=.6;hGrp.scale.setScalar(.85);sc.add(hGrp);
+const hGrp=new THREE.Group();hGrp.position.set(-9.7,0,-7.2);hGrp.rotation.y=-PI/2;hGrp.scale.setScalar(.85);sc.add(hGrp);
 {const wd2=M(0xb98a5a);[-2,2].forEach(x=>add(new THREE.CylinderGeometry(.1,.12,2.4,8),wd2,x,1.2,-.1,hGrp));add(new THREE.BoxGeometry(4.8,3,.14),wd2,0,2.1,0,hGrp);add(new THREE.BoxGeometry(5.1,.16,.55),M(0x2d6a8a),0,3.7,0,hGrp)}
 const hc2=document.createElement('canvas');hc2.width=800;hc2.height=480;const hCtx=hc2.getContext('2d'),hTex=new THREE.CanvasTexture(hc2);
-const hScr=new THREE.Mesh(new THREE.PlaneGeometry(4.5,2.7),new THREE.MeshStandardMaterial({map:hTex,roughness:.9,emissive:0xffffff,emissiveMap:hTex,emissiveIntensity:.14}));hScr.position.set(0,2.1,.09);hGrp.add(hScr);
+const hScr=new THREE.Mesh(new THREE.PlaneGeometry(4.5,2.7),new THREE.MeshBasicMaterial({map:hTex}));hScr.position.set(0,2.1,.09);hGrp.add(hScr);
 const hBulb=add(new THREE.SphereGeometry(.14,10,8),new THREE.MeshBasicMaterial({color:0xf1e6cc}),0,3.52,.35,hGrp);hBulb.castShadow=false;
 const hLamp=new THREE.PointLight(0xffd890,0,7,1.6);hLamp.position.set(0,3.4,.7);hGrp.add(hLamp);
 let hKey='';
@@ -810,14 +835,17 @@ const NPT=90,pPos=new Float32Array(NPT*3),pf=[],pG=new THREE.BufferGeometry();pG
 for(let i=0;i<NPT;i++)pf.push({x:rnd(-9.8,5),f:rnd(.05,.9),z:rnd(RZ0+.15,RZ1-.15)});
 const pts=new THREE.Points(pG,new THREE.PointsMaterial({color:0xffffff,size:.07,transparent:true,opacity:.85,depthWrite:false}));pts.frustumCulled=false;sc.add(pts);
 // 兩岸石欄杆與小橋
-const kerbM=M(0xcfc8bb),railM=M(0xf1ece0);
-[[RZ0,-.1],[RZ1,.1]].forEach(a=>{const zz=a[0]+a[1],xm=Math.sqrt(121-a[0]*a[0])-.35;add(new THREE.BoxGeometry(2*xm,.22,.2),kerbM,0,.11,zz).castShadow=false;
- for(let x=-xm;x<=xm;x+=.75){if(Math.abs(x)<1.05)continue;add(new THREE.BoxGeometry(.07,.5,.07),railM,x,.47,zz)}
- [[-xm,-1.05],[1.05,xm]].forEach(q=>{const L=q[1]-q[0],cx=(q[0]+q[1])/2;add(new THREE.BoxGeometry(L,.05,.05),railM,cx,.68,zz);add(new THREE.BoxGeometry(L,.04,.04),railM,cx,.5,zz)})});
+const kerbM=M(0xcfc8bb),railM=M(0x2aa6a0),railT=M(0xe0566b),railB=M(0xf2b134);
+[[RZ0,-.1],[RZ1,.1]].forEach(a=>{const zz=a[0]+a[1],xm=Math.sqrt(121-a[0]*a[0])-.12;add(new THREE.BoxGeometry(2*xm,.22,.2),kerbM,0,.11,zz).castShadow=false;
+ const gaps=[[-1.05,1.05]];
+ for(let x=-xm;x<=xm;x+=.75){if(gaps.some(g=>x>g[0]&&x<g[1]))continue;add(new THREE.BoxGeometry(.07,.5,.07),railM,x,.47,zz)}
+ [-xm,xm].concat(gaps.flat()).forEach(x=>add(new THREE.BoxGeometry(.09,.55,.09),railM,x,.49,zz));
+ const segs=[];{let st=-xm;gaps.forEach(g=>{segs.push([st,g[0]]);st=g[1]});segs.push([st,xm])}
+ segs.forEach(q=>{const L=q[1]-q[0],cx=(q[0]+q[1])/2;add(new THREE.BoxGeometry(L,.05,.05),railT,cx,.68,zz);add(new THREE.BoxGeometry(L,.04,.04),railB,cx,.5,zz)})});
 const brg=new THREE.Group(),brM2=M(0xd9c7a8);sc.add(brg);
 add(new THREE.BoxGeometry(1.7,.16,2),brM2,0,.3,RZC,brg);add(new THREE.BoxGeometry(1.7,.14,.88),brM2,0,.15,RZ0-.5,brg).rotation.x=-.36;add(new THREE.BoxGeometry(1.7,.14,.88),brM2,0,.15,RZ1+.53,brg).rotation.x=.36;
 [RZ0+.05,RZ1-.05].forEach(z=>add(new THREE.BoxGeometry(1.7,.7,.35),kerbM,0,-.05,z,brg));
-[-.82,.82].forEach(x=>{for(let i=0;i<5;i++)add(new THREE.BoxGeometry(.07,.42,.07),railM,x,.59,RZ0+.1+i*.4,brg);add(new THREE.BoxGeometry(.05,.05,1.8),railM,x,.78,RZC,brg)});
+[-.82,.82].forEach(x=>{for(let i=0;i<5;i++)add(new THREE.BoxGeometry(.07,.42,.07),railM,x,.59,RZ0+.1+i*.4,brg);add(new THREE.BoxGeometry(.05,.05,1.8),railT,x,.78,RZC,brg)});
 const bridgeY=(x,z)=>Math.abs(x)<.9?(z>=RZ0-.1&&z<=RZ1+.1?.3:z>RZ0-.9&&z<RZ0-.1?.3*(z-(RZ0-.9))/.8:z>RZ1+.1&&z<RZ1+.95?.3*(RZ1+.95-z)/.85:0):0;
 const ducks=[];for(let i=0;i<5;i++){const g=new THREE.Group(),yl=M(0xffd84d);add(new THREE.SphereGeometry(.2,12,10),yl,0,.12,0,g).scale.set(.9,.7,1.2);add(new THREE.SphereGeometry(.12,10,8),yl,0,.3,.17,g);add(new THREE.ConeGeometry(.05,.1,6),M(0xf28c1f),0,.29,.3,g).rotation.x=PI/2;g.scale.setScalar(1.1);g.position.set(rnd(-4.5,4.5),0,rnd(RZ0+.5,RZ1-.5));g.rotation.y=PI/2;sc.add(g);ducks.push({g,ph:rnd(0,6)})}
 let rvKey=-1,rvV=0;
@@ -828,9 +856,33 @@ function riverUpdate(dt){const r=(tideH(S.T+.05)-tideH(S.T-.05))/.1,tg=Math.max(
  ducks.forEach(d=>{const g=d.g;g.position.x+=rvV*dt;if(g.position.x>5.2)g.position.x=-9.2;if(g.position.x<-9.2)g.position.x=5.2;g.position.y=WY+.02+Math.sin(tm*2+d.ph)*.03;g.position.z+=Math.sin(tm*.5+d.ph)*.1*dt;g.position.z=Math.max(RZ0+.4,Math.min(RZ1-.4,g.position.z));
   if(Math.abs(rvV)>.05){let df=(rvV>0?PI/2:-PI/2)-g.rotation.y;df=Math.atan2(Math.sin(df),Math.cos(df));g.rotation.y+=df*Math.min(1,dt*3)}g.rotation.z=Math.sin(tm*1.6+d.ph)*.05});
 }
+// 每週行程：依星期切換船型、靠港與否、堆場與吊臂規則
+const WK={
+ 1:{n:'週一：空貨櫃船漂浮，不靠港',v:'cargo',dock:0,fill:'empty',cap:3,yh:3,ycap:3,cm:'off'},
+ 2:{n:'週二：堆場 3 層・船靠港・吊臂最高 1 層貨櫃',v:'cargo',dock:1,fill:'rand',cap:1,yh:3,ycap:3,cm:'ops'},
+ 3:{n:'週三：堆場 2 層・船靠港・吊臂最高 2 層貨櫃',v:'cargo',dock:1,fill:'rand',cap:2,yh:2,ycap:2,cm:'ops'},
+ 4:{n:'週四：堆場 1 層・船靠港・吊臂最高 3 層貨櫃',v:'cargo',dock:1,fill:'rand',cap:3,yh:1,ycap:1,cm:'ops'},
+ 5:{n:'週五：滿載貨櫃船漂浮，不靠港',v:'cargo',dock:0,fill:'full',cap:3,yh:0,ycap:3,cm:'off'},
+ 6:{n:'週六：白色雙層觀光遊艇停泊・吊臂固定鎖定',v:'yacht',dock:1,fill:'empty',cap:3,yh:2,ycap:3,cm:'locked'},
+ 0:{n:'週日：觀光遊艇漂浮・吊臂整理堆場',v:'yacht',dock:0,fill:'empty',cap:3,yh:'rand',ycap:3,cm:'tidy'}};
+function dayIdx(){const v=$('wd').value;return(v===undefined||v===''||v=='auto')?new Date(midTW()+12*36e5).getUTCDay():+v}
+function applyMode(d){const cf=WK[d];shipCap=cf.cap;yardCap=cf.ycap;craneMode=cf.cm;
+ [...shipSt,...yardSt].forEach(k=>{k.list.forEach(c=>c.parent&&c.parent.remove(c));k.list.length=0});if(cs.c){cs.c.parent&&cs.c.parent.remove(cs.c);cs.c=null}
+ shipSt.forEach(k=>{const h=cf.fill=='full'?3:cf.fill=='rand'?Math.floor(Math.random()*(cf.cap+1)):0;for(let l=0;l<h;l++){const c=mkC();c.position.set(k.lx,.95+l*.47,k.lz);ship.add(c);k.list.push(c)}});
+ const yh=yardSt.map(()=>cf.yh=='rand'?Math.floor(Math.random()*4):cf.yh);if(cf.yh=='rand'&&Math.max(...yh)-Math.min(...yh)<2){yh[0]=3;yh[yh.length-1]=0}
+ yardSt.forEach((k,i)=>{for(let l=0;l<yh[i];l++){const c=mkC();c.position.set(k.x,.23+l*.47,k.z);sc.add(c);k.list.push(c)}});
+ cs.st='wait';cs.ph=0;cs.t=2;cs.src=cs.dst=null;
+ if(lastV!=cf.v){lastV=cf.v;const pv=cf.v=='cargo'?ship:yacht;pv.position.x=cf.dock?(cf.v=='cargo'?-11.3:-11.05):-17.5;pv.position.z=0}
+ $('wdn').textContent=cf.n}
+function vessel(v,act,dock,dx,dt,wy,k){if(!act)return;const tx=dock?dx:-17.5+Math.sin(tm*.1)*.6,tz=dock?0:-1+Math.sin(tm*.08)*3,ry=dock?0:Math.sin(tm*.15)*.12,f=Math.min(1,dt*.7);
+ v.position.x+=(tx-v.position.x)*f;v.position.z+=(tz-v.position.z)*f;v.rotation.y+=(ry-v.rotation.y)*f;
+ v.position.y=wy+Math.sin(tm*.8+k)*.04;v.rotation.z=Math.sin(tm*.6+k)*.015;v.rotation.x=Math.cos(tm*.5+k)*.01}
+
 function seaUpdate(dt){const wy=WY=yw(tideH(S.T));seaBig.position.y=wy-.07;seaPatch.position.y=wy;
  const p=seaPatch.geometry.attributes.position;for(let i=0;i<p.count;i++)p.setZ(i,Math.sin(p.getX(i)*.4+tm*1.2)*.05+Math.cos(p.getY(i)*.45+tm*.9)*.05);p.needsUpdate=true;
- ship.position.y=wy+Math.sin(tm*.8)*.04;ship.rotation.z=Math.sin(tm*.6)*.015;ship.rotation.x=Math.cos(tm*.5)*.01}
+  const d0=dayIdx();if(d0!=curDay){curDay=d0;applyMode(d0)}
+ const cf=WK[curDay];ship.visible=cf.v=='cargo';yacht.visible=cf.v=='yacht';
+ vessel(ship,cf.v=='cargo',cf.dock,-11.3,dt,wy,0);vessel(yacht,cf.v=='yacht',cf.dock,-11.05,dt,wy,1)}
 async function loadTide(){try{const r=await fetch('https://marine-api.open-meteo.com/v1/marine?latitude=22.6143&longitude=120.2733&hourly=sea_level_height_msl&timezone=Asia%2FTaipei&forecast_days=1'),j=await r.json(),a=(j.hourly.sea_level_height_msl||[]).slice(0,24);
  if(a.length==24&&a.every(v=>typeof v=='number'&&isFinite(v))){TD=a;TDsrc='Open-Meteo Marine'}else{TD=null;TDsrc='估算'}}catch(e){TD=null;TDsrc='估算（離線）'}tideBuild()}
 tideBuild();loadTide();setInterval(loadTide,36e5);
@@ -843,7 +895,7 @@ add(new THREE.BoxGeometry(4.7,.16,.5),M(0x9c4f46),0,3.3,0,bGrp);
 const bBulb=add(new THREE.SphereGeometry(.14,10,8),new THREE.MeshBasicMaterial({color:0xf1e6cc}),0,3.15,.3,bGrp);bBulb.castShadow=false;
 const bLamp=new THREE.PointLight(0xffd890,0,7,1.6);bLamp.position.set(0,3.05,.6);bGrp.add(bLamp);
 const bc=document.createElement('canvas');bc.width=780;bc.height=420;const bx=bc.getContext('2d'),bTex=new THREE.CanvasTexture(bc);
-const bScr=new THREE.Mesh(new THREE.PlaneGeometry(4.1,2.2),new THREE.MeshStandardMaterial({map:bTex,roughness:.9,emissive:0xffffff,emissiveMap:bTex,emissiveIntensity:.14}));bScr.position.set(0,1.95,.09);bGrp.add(bScr);
+const bScr=new THREE.Mesh(new THREE.PlaneGeometry(4.1,2.2),new THREE.MeshBasicMaterial({map:bTex}));bScr.position.set(0,1.95,.09);bGrp.add(bScr);
 let bKey='';
 function drawBoard(){const h=Math.min(23,Math.max(0,Math.floor(S.T))),key=h+'|'+(+S.temp).toFixed(1)+'|'+HR[0]+HR[12];if(key==bKey)return;bKey=key;
  const vals=HR.concat([+S.temp]),mn=Math.floor(Math.min(...vals))-1,mx=Math.ceil(Math.max(...vals))+1,x0=80,x1=740,y0=120,y1=350,px=i=>x0+(x1-x0)*i/23,py=v=>y1-(v-mn)/(mx-mn)*(y1-y0);
