@@ -109,15 +109,16 @@ trees.forEach(t=>{const th0=t.th;
   const w2=new THREE.Mesh(tg,brM);w2.position.copy(dir).multiplyScalar(L*.6).add(b.position);w2.quaternion.setFromUnitVectors(Vy,d2);w2.castShadow=true;t.g.add(w2)}
  t.leaf=new THREE.InstancedMesh(lfG,lfM,110);t.leaf.setColorAt(0,new THREE.Color(0xffffff));t.leaf.castShadow=true;t.leaf.count=0;t.g.add(t.leaf);
  t.fr=[];for(let i=0;i<8;i++){const f=new THREE.Mesh(new THREE.SphereGeometry(.09,10,8),frM[i%2]);f.castShadow=true;f.visible=false;t.g.add(f);t.fr.push(f)}});
-const LC={spring:{n:60,z:.9,c:[0xb9ee8a,0xa6e07a,0xcdf5a0]},summer:{n:110,z:1.3,c:[0x1f6e3c,0x2a8048,0x17592f]},autumn:{n:95,z:1.1,c:[0xf2b134,0xf28c1f,0xd63a2b]},winter:{n:0,z:1,c:[0x8c5a2b]}};
-const AUT=[0xf2b134,0xf28c1f,0xd63a2b],WIN=[0x8c5a2b,0xa8703a,0xb98a4a,0x7a4e28];
+const LC={spring:{n:0,z:.9,c:[0xb9ee8a,0xa6e07a,0xcdf5a0]},summer:{n:0,z:1.3,c:[0x1f6e3c,0x2a8048,0x17592f]},autumn:{n:0,z:1.1,c:[0xf2b134,0xf28c1f,0xd63a2b]},winter:{n:0,z:1,c:[0x8c5a2b]}};
+const AUT=[0xf2b134,0xf28c1f,0xd63a2b],WIN=[0x6f4e37,0x5c4033,0x8b5a2b,0x7a5230];
+const FALLC={spring:[0xb6e388,0xa6e07a,0xcdf5a0],summer:[0x2f8f4e,0x1f6e3c,0x2a8048],autumn:AUT,winter:[0x6f4e37,0x5c4033,0x8b5a2b]},FALLN={spring:50,summer:40,autumn:110,winter:60};
 const litter=new THREE.InstancedMesh(ell(.11,.14),lfM,140);litter.setColorAt(0,new THREE.Color(0xffffff));litter.count=0;sc.add(litter);
 const NFALL=110,fall=new THREE.InstancedMesh(ell(.09,.12),lfM,NFALL);fall.setColorAt(0,new THREE.Color(0xffffff));sc.add(fall);
 const fx=[],fy=[],fz=[],fv=[],fph=[],frs=[];for(let i=0;i<NFALL;i++){fx.push(0);fy.push(.04);fz.push(0);fv.push(rnd(.5,1));fph.push(rnd(0,6));frs.push(rnd(0,8));fall.setColorAt(i,new THREE.Color(AUT[i%3]))}
 function spawnLeaf(i){const t=trees[Math.floor(Math.random()*trees.length)],c=t.cr[Math.floor(Math.random()*t.cr.length)],R=c.geometry.parameters.radius*.95,d=new THREE.Vector3(rnd(-1,1),rnd(0,1),rnd(-1,1)).normalize(),S1=t.g.scale.x;
  fx[i]=t.g.position.x+(c.position.x+d.x*R)*S1;fy[i]=(c.position.y+d.y*R)*S1;fz[i]=t.g.position.z+(c.position.z+d.z*R)*S1;fv[i]=rnd(.5,1)}
-function fallUpdate(dt,wd,dx,dz,on){fall.count=on?NFALL:0;if(!on)return;
- for(let i=0;i<NFALL;i++){let rest=fy[i]<=.045;
+function fallUpdate(dt,wd,dx,dz,on){fall.count=on;if(!on)return;
+ for(let i=0;i<on;i++){let rest=fy[i]<=.045;
   if(rest){frs[i]-=dt;if(frs[i]<=0)spawnLeaf(i)}
   else{fy[i]-=fv[i]*dt;fx[i]+=(dx*wd*.05+Math.sin(tm*1.6+fph[i])*.4)*dt;fz[i]+=(dz*wd*.05+Math.cos(tm*1.3+fph[i])*.3)*dt;if(fy[i]<=.045){fy[i]=.04;frs[i]=rnd(3,8)}}
   Dm.position.set(fx[i],fy[i],fz[i]);Dm.scale.setScalar(1);rest=fy[i]<=.045;
@@ -125,13 +126,14 @@ function fallUpdate(dt,wd,dx,dz,on){fall.count=on?NFALL:0;if(!on)return;
   Dm.updateMatrix();fall.setMatrixAt(i,Dm.matrix)}
  fall.instanceMatrix.needsUpdate=true}
 function treeSeason(se){const cf=LC[se],cs=CS[se];
+ {const fp=FALLC[se];for(let i=0;i<NFALL;i++)fall.setColorAt(i,tmp.set(fp[i%fp.length]));fall.instanceColor.needsUpdate=true}
  trees.forEach(t=>{const im=t.leaf;im.count=cf.n;
   for(let i=0;i<cf.n;i++){const c=t.cr[Math.floor(Math.random()*t.cr.length)],R=c.geometry.parameters.radius*cs,d=new THREE.Vector3(rnd(-1,1),rnd(-.4,1),rnd(-1,1)).normalize();
    Dm.position.copy(c.position).addScaledVector(d,R*rnd(.92,1.08));Dm.quaternion.setFromUnitVectors(Vz,d);Dm.rotateZ(rnd(0,PI*2));Dm.scale.setScalar(cf.z*rnd(.8,1.2));Dm.updateMatrix();
    im.setMatrixAt(i,Dm.matrix);im.setColorAt(i,tmp.set(cf.c[i%cf.c.length]))}
   im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;
   t.fr.forEach(f=>{f.visible=se=='summer';if(f.visible){const c=t.cr[Math.floor(Math.random()*t.cr.length)],R=c.geometry.parameters.radius*cs,d=new THREE.Vector3(rnd(-1,1),rnd(-.5,.6),rnd(-1,1)).normalize();f.position.copy(c.position).addScaledVector(d,R*1.02)}})});
- const n=se=='winter'?140:se=='autumn'?45:0,pal=se=='winter'?WIN:AUT;litter.count=n;
+ const n=se=='winter'?140:se=='autumn'?45:20,pal=se=='winter'?WIN:se=='autumn'?AUT:FALLC[se];litter.count=n;
  for(let i=0;i<n;i++){let x,z;do{const a=rnd(0,PI*2),r=Math.sqrt(Math.random())*9.3;x=Math.cos(a)*r;z=Math.sin(a)*r}while((x>-5.4&&x<-.6&&z>-3.9&&z<.2)||(z>3&&z<5.4)||x<-9.1||z>7.2);
   Dm.position.set(x,.035,z);Dm.rotation.set(-PI/2,0,rnd(0,PI*2));Dm.scale.setScalar(rnd(.8,1.3));Dm.updateMatrix();litter.setMatrixAt(i,Dm.matrix);litter.setColorAt(i,tmp.set(pal[i%pal.length]))}
  litter.instanceMatrix.needsUpdate=true;if(litter.instanceColor)litter.instanceColor.needsUpdate=true}
@@ -484,10 +486,10 @@ const stG=new THREE.BufferGeometry();stG.setAttribute('position',new THREE.Float
 const stars=new THREE.Points(stG,new THREE.PointsMaterial({color:0xfff6d8,size:2.2,sizeAttenuation:false,transparent:true,fog:false}));sc.add(stars);
 // 太陽 / 月亮
 function glowTex(c){const k=document.createElement('canvas');k.width=k.height=128;const x=k.getContext('2d'),g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,c);g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(k)}
-const sunM=new THREE.Mesh(new THREE.SphereGeometry(1.1,24,18),new THREE.MeshBasicMaterial({color:0xffe38a,fog:false}));sc.add(sunM);
-const sunG=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(255,225,140,.85)'),transparent:true,fog:false,depthWrite:false}));sunG.scale.setScalar(9);sunM.add(sunG);
+const sunM=new THREE.Mesh(new THREE.SphereGeometry(.65,24,18),new THREE.MeshBasicMaterial({color:0xffe38a,fog:false}));sc.add(sunM);
+const sunG=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(255,225,140,.85)'),transparent:true,fog:false,depthWrite:false}));sunG.scale.setScalar(5.2);sunM.add(sunG);
 const mk=document.createElement('canvas');mk.width=mk.height=128;const mx=mk.getContext('2d'),mTex=new THREE.CanvasTexture(mk);
-const moon=new THREE.Sprite(new THREE.SpriteMaterial({map:mTex,transparent:true,fog:false,depthWrite:false}));moon.scale.setScalar(3.2);sc.add(moon);
+const moon=new THREE.Sprite(new THREE.SpriteMaterial({map:mTex,transparent:true,fog:false,depthWrite:false}));moon.scale.setScalar(2);sc.add(moon);
 let lastPh=-1;
 function drawMoon(p){if(Math.abs(p-lastPh)<.004)return;lastPh=p;const w=p>=.5,q=w?1-p:p,k=Math.cos(2*PI*q);
  mx.clearRect(0,0,128,128);mx.save();if(w){mx.translate(128,0);mx.scale(-1,1)}
@@ -542,7 +544,7 @@ function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-t0)/1e
  const dome=(az,al,H,V)=>[-Math.sin(az)*Math.cos(al)*H,Math.sin(al)*V,Math.cos(az)*Math.cos(al)*H],sd=dome(sp.azimuth,sA,1,1),md2=dome(mp.azimuth,mAlt,1,1),sp3=dome(sp.azimuth,sA,DH,DV),mp3=dome(mp.azimuth,mAlt,DH,DV);
  {const bk=BR[S.wx]||BR.clear;bs+=(bk[0]-bs)*Math.min(1,dt*1.5);ba+=(bk[1]-ba)*Math.min(1,dt*1.5)}
  NIGHT=!dayOn;sunM.visible=sA>-.02;sunM.position.set(sp3[0],sp3[1],sp3[2]);sunM.material.color.set(0xffe38a).lerp(tmp.set(0xffa86b),1-light);sunM.material.transparent=true;sunM.material.opacity=cl(.15+bs,0,1);sunG.material.opacity=cl(bs*1.1,0,1);
- moon.visible=mUp;moon.position.set(mp3[0],mp3[1],mp3[2]);moon.material.opacity=cl(1-light*.7,.3,1);drawMoon(mi.phase);
+ moon.visible=mUp;moon.position.set(mp3[0],mp3[1],mp3[2]);moon.material.opacity=cl(1-light*.7,.3,1);drawMoon(mi.phase);sunMoonTags(sp3,mp3,mi);
  // 天空
  skyC.copy(NIGHTC).lerp(DAY,light).lerp(WARM,twi*.55);skyC.lerp(tmp.copy(GRAYC).multiplyScalar(.3+.7*light),gray);
  if(w.t&&Math.random()<.006)flash=1;flash=Math.max(0,flash-dt*3);skyC.lerp(tmp.set(0xffffff),flash*.5);
@@ -567,7 +569,7 @@ function loop(now){requestAnimationFrame(loop);const dt=Math.min(.05,(now-t0)/1e
  let tg=Math.atan2(-dz,dx),df=tg-ang;df=Math.atan2(Math.sin(df),Math.cos(df));ang+=df*.05;fp.rotation.y=ang;anem.rotation.y+=(.15+wd*.25)*dt;planeV.rotation.y=ang;prop.rotation.x+=(1+wd*.8)*dt;
  const pa=fg.attributes.position,k=2+wd*.35,am=cl(.05+wd*.012,.05,.5),tH=-.95+1.35*cl(wd/35,0,1);
  for(let i=0;i<pa.count;i++){const x=fo[i*3];pa.setZ(i,Math.sin(x*4-tm*k)*am*x);pa.setY(i,fo[i*3+1]+tH*(x/1.7)*(x/1.7)+Math.sin(x*5-tm*k*1.3)*am*.3*x)}pa.needsUpdate=true;fg.computeVertexNormals();
- fallUpdate(dt,wd,dx,dz,season=='autumn');windUpdate(dt,wd,dx,dz);seaUpdate(dt);craneUpdate(dt,w);riverUpdate(dt);
+ fallUpdate(dt,wd,dx,dz,FALLN[season]);windUpdate(dt,wd,dx,dz);seaUpdate(dt);craneUpdate(dt,w);riverUpdate(dt);
  boyUpdate(dt,w);nightUpdate(dt,w);
  // 寵物、小鳥、長草
  pets.forEach(a=>petUpdate(a,dt,w));
@@ -692,7 +694,7 @@ function buildSolstice(){const y=new Date(midTW()+12*36e5).getUTCFullYear();
   for(let t=sr;t<ss;t+=1/6){const r=P(t);pts.push(...r[0]);if(r[1]>best){best=r[1];bp=r[0]}}pts.push(...P(ss)[0]);
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));const ln=new THREE.Line(g,solMs[i]);ln.computeLineDistances();ln.frustumCulled=false;solGrp.add(ln);
   const dot=new THREE.Mesh(new THREE.SphereGeometry(.2,12,10),new THREE.MeshBasicMaterial({color:i?0x3b8be0:0xff5a3c,fog:false}));dot.position.set(bp[0],bp[1],bp[2]);solGrp.add(dot);
-  const tg=mkTag(4.4);pathGrp.remove(tg.sp);solGrp.add(tg.sp);setTag(tg,a[2]+'・正午高度角 '+Math.round(best*57.3)+'°',i?'#3b8be0':'#ff5a3c');tg.sp.position.set(bp[0],bp[1]+.9,bp[2])})}
+  const tg=mkTag(4.4);pathGrp.remove(tg.sp);solGrp.add(tg.sp);setTag(tg,a[2]+'・正午高度角 '+Math.round(best*57.3)+'°',i?'#3b8be0':'#ff5a3c');tg.sp.position.set(15.8,-1.5,i?2.2:-2.2)})}
 buildSolstice();$('sol').onchange=()=>{solGrp.visible=$('sol').checked};
 {const rp=[];for(let i=0;i<=128;i++){const a=i/128*PI*2;rp.push(Math.cos(a)*DH,-1.25,Math.sin(a)*DH)}const rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.Float32BufferAttribute(rp,3));pathGrp.add(new THREE.Line(rg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.55,fog:false})))}
 $('spk').onchange=()=>{pathGrp.visible=$('spk').checked};
@@ -719,7 +721,7 @@ const seaPatch=new THREE.Mesh(new THREE.PlaneGeometry(40,40,40,40),M(0x58b4d8,{r
 const stf=new THREE.Group();stf.position.set(-10.15,0,-7.2);sc.add(stf);
 for(let i=0;i<12;i++)add(new THREE.BoxGeometry(.14,.2,.14),M(i%2?0xffffff:0xe0566b),0,-2.3+i*.2+.1,0,stf);
 const hiF=add(new THREE.BoxGeometry(.8,.09,.09),M(0xe0566b),-.45,0,0,stf),loF=add(new THREE.BoxGeometry(.8,.09,.09),M(0x3b82c4),-.45,0,0,stf);
-function tideBuild(){tideCalc();hiF.position.y=yw(TE.hi.h);loF.position.y=yw(TE.lo.h)}
+function tideBuild(){tideCalc();hiF.position.y=yw(TE.hi.h);loF.position.y=yw(TE.lo.h);rvMark()}
 // 貨櫃船、貨櫃起重架
 const shipLs=[],shipWinM=M(0x2b3a55,{emissive:0xffd27a,emissiveIntensity:0});
 const ship=new THREE.Group();ship.position.set(-11.3,0,0);sc.add(ship);
@@ -856,6 +858,23 @@ function riverUpdate(dt){const r=(tideH(S.T+.05)-tideH(S.T-.05))/.1,tg=Math.max(
  ducks.forEach(d=>{const g=d.g;g.position.x+=rvV*dt;if(g.position.x>5.2)g.position.x=-9.2;if(g.position.x<-9.2)g.position.x=5.2;g.position.y=WY+.02+Math.sin(tm*2+d.ph)*.03;g.position.z+=Math.sin(tm*.5+d.ph)*.1*dt;g.position.z=Math.max(RZ0+.4,Math.min(RZ1-.4,g.position.z));
   if(Math.abs(rvV)>.05){let df=(rvV>0?PI/2:-PI/2)-g.rotation.y;df=Math.atan2(Math.sin(df),Math.cos(df));g.rotation.y+=df*Math.min(1,dt*3)}g.rotation.z=Math.sin(tm*1.6+d.ph)*.05});
 }
+// 愛河溝內：最高、最低潮位水平線
+const rvLines=[];[['hi',0xe0566b],['lo',0x3b82c4]].forEach(a=>[[7.81,7.7]].forEach(b=>{const m=add(new THREE.BoxGeometry(2*b[1],.04,.03),new THREE.MeshBasicMaterial({color:a[1]}),0,0,b[0]);m.castShadow=m.receiveShadow=false;m.userData.k=a[0];rvLines.push(m)}));
+const mkWT=w=>{const c=document.createElement('canvas');c.width=320;c.height=84;const t=new THREE.CanvasTexture(c),sp=new THREE.Mesh(new THREE.PlaneGeometry(w,w*.2625),new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,depthTest:false}));sp.renderOrder=3;sc.add(sp);return{c,t,sp}};
+const rvHiT=mkWT(1.9),rvLoT=mkWT(1.9);
+function rvMark(){rvLines.forEach(m=>m.position.y=yw(m.userData.k=='hi'?TE.hi.h:TE.lo.h));setTag(rvHiT,'最高潮位 '+sgn(TE.hi.h),'#e0566b');setTag(rvLoT,'最低潮位 '+sgn(TE.lo.h),'#3b82c4');rvHiT.sp.position.set(6.2,yw(TE.hi.h)+.2,7.815);rvLoT.sp.position.set(6.2,yw(TE.lo.h)+.2,7.815)}
+// 太陽、月亮日期時間標示（月亮含農曆與月相）
+const sunT=mkTagF(3),moonT=mkTagF(3.4);let smK='';
+function setTag2(g,l1,l2,col){const x=g.c.getContext('2d'),r=22;x.clearRect(0,0,320,84);x.fillStyle='rgba(255,250,240,.93)';x.strokeStyle=col;x.lineWidth=5;
+ x.beginPath();x.moveTo(r+4,4);x.lineTo(316-r,4);x.arcTo(316,4,316,4+r,r);x.lineTo(316,80-r);x.arcTo(316,80,316-r,80,r);x.lineTo(4+r,80);x.arcTo(4,80,4,80-r,r);x.lineTo(4,4+r);x.arcTo(4,4,4+r,4,r);x.closePath();x.fill();x.stroke();
+ x.fillStyle='#5a4a42';x.textAlign='center';x.textBaseline='middle';const fit=(t,m)=>{let u=0;for(const ch of t)u+=ch.charCodeAt(0)>255?1:.58;return Math.min(m,Math.floor(290/u))};
+ x.font='bold '+fit(l1,28)+'px sans-serif';x.fillText(l1,160,26);x.font='bold '+fit(l2,26)+'px sans-serif';x.fillText(l2,160,59);g.t.needsUpdate=true}
+const lunD=n=>n<=10?'初'+'一二三四五六七八九十'[n-1]:n<20?'十'+'一二三四五六七八九'[n-11]:n==20?'二十':n<30?'廿'+'一二三四五六七八九'[n-21]:'三十';
+function lunarStr(d){try{const p=new Intl.DateTimeFormat('zh-TW-u-ca-chinese',{month:'long',day:'numeric',timeZone:'Asia/Taipei'}).formatToParts(d),m=p.find(q=>q.type=='month'),dd=p.find(q=>q.type=='day');return m&&dd?'農曆'+m.value+lunD(+dd.value):''}catch(e){return ''}}
+const phaseN=p=>p<.03||p>.97?'新月':p<.22?'眉月':p<.28?'上弦月':p<.47?'盈凸月':p<.53?'滿月':p<.72?'虧凸月':p<.78?'下弦月':'殘月';
+function sunMoonTags(sp3,mp3,mi){const D=new Date(midTW()+S.T*36e5),tw=new Date(D.getTime()+288e5),ts=(tw.getUTCMonth()+1)+'/'+tw.getUTCDate()+' '+fmt(S.T),key=Math.floor(S.T*12)+'|'+tw.getUTCDate()+'|'+Math.round(mi.phase*100);
+ sunT.sp.visible=sunM.visible;sunT.sp.position.set(sp3[0],sp3[1]-1,sp3[2]);moonT.sp.visible=moon.visible&&NIGHT;moonT.sp.position.set(mp3[0],mp3[1]-1.2,mp3[2]);
+ if(key==smK)return;smK=key;const lu=lunarStr(D);setTag(sunT,'☀ '+ts,'#e0a800');setTag2(moonT,'🌙 '+ts,(lu?lu+'・':'')+phaseN(mi.phase),'#8d7fc4')}
 // 每週行程：依星期切換船型、靠港與否、堆場與吊臂規則
 const WK={
  1:{n:'週一：空貨櫃船漂浮，不靠港',v:'cargo',dock:0,fill:'empty',cap:3,yh:3,ycap:3,cm:'off'},
