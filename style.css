@@ -1,0 +1,240 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  color: #5a4a42;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+}
+
+/* 左側控制面板 */
+#control-panel {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  width: 250px;
+  max-height: calc(100% - 20px);
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 250, 243, .9);
+  box-shadow: 0 6px 24px rgba(120, 90, 70, .18);
+  font-size: 13px;
+}
+
+#control-panel h1 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#control-panel.is-hidden {
+  display: none;
+}
+
+#panel-toggle {
+  display: none;
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(120, 90, 70, .25);
+}
+
+.control-row {
+  margin: 6px 0;
+}
+
+.control-row label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.control-row label.checkbox-label {
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.control-row b {
+  font-weight: 600;
+  color: #d9667a;
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+.hint-text {
+  opacity: .7;
+  margin-top: 2px;
+}
+
+#weekday-desc {
+  opacity: .8;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: #ff9fa8;
+}
+
+select, button {
+  font: inherit;
+  border: 0;
+  border-radius: 10px;
+  padding: 5px 8px;
+  background: #ffe3e6;
+  color: #5a4a42;
+  cursor: pointer;
+}
+
+select {
+  width: 100%;
+}
+
+.mode-group {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-group button {
+  flex: 1;
+}
+
+.mode-group .is-active {
+  background: #ff9fa8;
+  color: #fff;
+}
+
+#status-text {
+  font-size: 11px;
+  opacity: .75;
+  margin: 6px 0;
+}
+
+/* 底部狀態列 HUD */
+#hud-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 250, 243, .92);
+  box-shadow: 0 4px 16px rgba(120, 90, 70, .2);
+  font-size: 14px;
+  white-space: nowrap;
+  max-width: 94vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 右側布告欄彈窗 */
+#bulletin-board {
+  display: none;
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  width: 320px;
+  box-sizing: border-box;
+  padding: 10px 12px 12px;
+  border-radius: 14px;
+  background: #fff7e6;
+  border: 6px solid #c89b6d;
+  box-shadow: 0 6px 24px rgba(120, 90, 70, .25);
+  font-size: 13px;
+}
+
+#bulletin-board.is-open {
+  display: block;
+}
+
+#bulletin-board h2 {
+  margin: 0;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+#bulletin-board .board-pin {
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e0566b;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, .3);
+}
+
+#board-clock {
+  font: 700 38px/1.2 "Courier New", monospace;
+  text-align: center;
+  color: #e0566b;
+  letter-spacing: 2px;
+  margin: 6px 0 2px;
+  text-shadow: 0 1px 0 #fff;
+}
+
+#board-summary {
+  text-align: center;
+  font-size: 12px;
+  opacity: .8;
+  margin-bottom: 6px;
+}
+
+#tide-summary {
+  text-align: center;
+  font-size: 12px;
+  margin: 0 0 4px;
+}
+
+#tide-table {
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0 0 6px;
+}
+
+#tide-chart-wrap {
+  height: 170px;
+  margin-top: 6px;
+}
+
+#temp-chart-wrap {
+  height: 190px;
+}
+
+.board-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.board-controls input[type=range] {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  #control-panel {
+    width: 200px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  #bulletin-board {
+    width: 260px;
+  }
+}

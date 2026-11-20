@@ -1,12 +1,110 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=kaohsiung-weather-3d.html">
-    <title>轉址中...</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>高雄 3D 氣象小鎮</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <p>正在前往高雄 3D 天氣頁面，若瀏覽器未自動跳轉，請點擊 <a href="kaohsiung-weather-3d.html">此連結</a>。</p>
+  <button id="panel-toggle" title="顯示設定欄">⚙ 設定</button>
+
+  <aside id="control-panel">
+    <h1>
+      <span>🏡 高雄氣象小鎮</span>
+      <button id="panel-hide" title="隱藏設定欄">◀ 隱藏</button>
+    </h1>
+
+    <div class="mode-group">
+      <button id="mode-live">即時</button>
+      <button id="mode-manual">手動</button>
+      <button id="mode-replay">時間軸</button>
+    </div>
+
+    <div id="status-text"></div>
+    <div id="controls-container"></div>
+
+    <div class="control-row">
+      <button id="btn-play-day" style="width:100%">▶ 播放一天</button>
+    </div>
+
+    <div class="control-row small-text">
+      <label class="checkbox-label">
+        <input type="checkbox" id="chk-sun-path" checked>顯示太陽軌跡
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="chk-solstice-path" checked>顯示夏至、冬至軌跡
+      </label>
+      <div class="hint-text">虛線＝今日太陽路徑（SunCalc）；小鎮圓外為地平線</div>
+    </div>
+
+    <div class="control-row small-text">
+      <label class="checkbox-label">
+        <input type="checkbox" id="chk-auto-rotate">自動旋轉視角
+      </label>
+      <select id="select-rotate-speed">
+        <option value=".08">慢</option>
+        <option value=".15" selected>中</option>
+        <option value=".3">快</option>
+      </select>
+    </div>
+
+    <div class="control-row small-text">
+      <div>港口每週行程（貨櫃船／遊艇／起重架）</div>
+      <select id="select-weekday">
+        <option value="auto" selected>自動（依今天）</option>
+        <option value="1">週一</option>
+        <option value="2">週二</option>
+        <option value="3">週三</option>
+        <option value="4">週四</option>
+        <option value="5">週五</option>
+        <option value="6">週六</option>
+        <option value="0">週日</option>
+      </select>
+      <div id="weekday-desc"></div>
+    </div>
+  </aside>
+
+  <div id="hud-bar"></div>
+
+  <section id="bulletin-board">
+    <div class="board-pin"></div>
+    <h2 id="bulletin-header">
+      <span>📋 布告欄</span>
+      <span id="bulletin-close">✕</span>
+    </h2>
+    <div id="bulletin-body">
+      <div id="board-clock">00:00:00</div>
+      <div id="board-summary"></div>
+      <div id="tide-summary"></div>
+      <div id="tide-table"></div>
+      <div id="tide-chart-wrap"><canvas id="tide-chart"></canvas></div>
+      <div id="temp-chart-wrap"><canvas id="temp-chart"></canvas></div>
+      <div class="board-controls">
+        <button id="board-play">▶ 自動播放</button>
+        <input type="range" id="board-time-slider" min="0" max="23.99" step=".01">
+        <button id="board-live">即時</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 外部函式庫 -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+
+  <!-- 1. 基礎設定與資料 -->
+  <script defer src="config.js"></script>
+  <script defer src="climate-data.js"></script>
+
+  <!-- 2. 3D 場景與自然環境 -->
+  <script defer src="stage-base.js"></script>
+  <script defer src="atmosphere.js"></script>
+  <script defer src="waterfront.js"></script>
+  <script defer src="living-world.js"></script>
+
+  <!-- 3. 介面互動與總控啟動 -->
+  <script defer src="ui-board.js"></script>
+  <script defer src="main.js"></script>
 </body>
 </html>
