@@ -10,18 +10,35 @@
     return { o, sp, r, pause, t: pick(r), w: 0, ph: rnd(0, 6), mv: 0 };
   }
 
-  function stepW(k, dt) {
+function stepW(k, dt) {
     const o = k.o;
     if (k.w > 0) { k.w -= dt; k.mv = 0; return; }
-    const dx = k.t[0] - o.position.x, dz = k.t[1] - o.position.z, d = Math.hypot(dx, dz);
-    if (d < 0.2) { k.w = rnd(k.pause[0], k.pause[1]); k.t = pick(k.r); k.mv = 0; return; }
+    const distGoal = Math.hypot(k.t[0] - o.position.x, k.t[1] - o.position.z);
+    if (distGoal < 0.2) { k.w = rnd(k.pause[0], k.pause[1]); k.t = pick(k.r); k.mv = 0; return; }
+
+    // 若目標與目前位置分別在愛河兩岸，先導向小橋出入口再過橋
+    let tx = k.t[0], tz = k.t[1], crossing = false;
+    if (tz > 9.7 && o.position.z < 10.05) {
+      crossing = true;
+      if (o.position.z < 7.05 && Math.abs(o.position.x) > 0.3) { tx = 0; tz = 6.9; }
+      else { tx = 0; tz = 10.45; }
+    } else if (tz < 7.5 && o.position.z > 7.1) {
+      crossing = true;
+      if (o.position.z > 9.95 && Math.abs(o.position.x) > 0.3) { tx = 0; tz = 10.45; }
+      else { tx = 0; tz = 6.9; }
+    }
+
+    const dx = tx - o.position.x, dz = tz - o.position.z, d = Math.hypot(dx, dz) || 1;
     const nx = o.position.x + dx / d * k.sp * dt, nz = o.position.z + dz / d * k.sp * dt;
     let px = nx, pz = nz;
     if (!free(nx, nz, k.r)) {
-      if (!k.sh && !k.sl) { k.t = pick(k.r); k.w = rnd(0.2, 0.8); k.mv = 0; return; }
+      if (!k.sh && !k.sl && !crossing) { k.t = pick(k.r); k.w = rnd(0.2, 0.8); k.mv = 0; return; }
       const sx = -dz / d * k.sp * dt, sz = dx / d * k.sp * dt, s1 = k.sd || 1;
       px = o.position.x + sx * s1; pz = o.position.z + sz * s1;
-      if (!free(px, pz, k.r)) { k.sd = -s1; px = o.position.x - sx * s1; pz = o.position.z - sz * s1; if (!free(px, pz, k.r)) { px = nx; pz = nz; } }
+      if (!free(px, pz, k.r)) {
+        k.sd = -s1; px = o.position.x - sx * s1; pz = o.position.z - sz * s1;
+        if (!free(px, pz, k.r)) { px = nx; pz = nz; }
+      }
     }
     o.position.x = px; o.position.z = pz; k.mv = 1; k.ph += dt * k.sp * 5;
     let df = Math.atan2(dx, dz) - o.rotation.y;

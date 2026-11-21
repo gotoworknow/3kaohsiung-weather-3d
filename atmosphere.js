@@ -80,7 +80,7 @@
   }
 
   // 太陽軌跡、夏冬至軌跡、日月標籤
-  const DH = 16.5, DV = 10;
+  const DH = 14.5, DV = 10;
   const domePt = (az, al) => [-Math.sin(az) * Math.cos(al) * DH, Math.sin(al) * DV, Math.cos(az) * Math.cos(al) * DH];
   const pathGrp = new THREE.Group();
   sc.add(pathGrp);

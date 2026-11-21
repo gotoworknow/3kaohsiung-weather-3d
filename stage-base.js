@@ -1,5 +1,5 @@
 (function (App) {
-  const { PI, cl, rnd, GR, CR, FL, CS, TR, LC, AUT, WIN, FALLC, FALLN, RZ0, RZ1, runtime } = App;
+  const { PI, cl, rnd, GR, CR, FL, CS, TR, AUT, WIN, FALLC, FALLN, RZ0, RZ1, runtime } = App;
 
   // 渲染器、場景、鏡頭與基礎燈光
   const R = new THREE.WebGLRenderer({ antialias: true });
@@ -153,9 +153,9 @@
   add(new THREE.BoxGeometry(0.9, 0.8, 0.12), winM, -0.9, 2.0, -1.72, house);
   add(new THREE.BoxGeometry(0.5, 1.2, 0.5), M(0xe7c9a9), 1.1, 3.6, -0.6, house);
 
-  // 障礙物與樹木
+  // 障礙物與樹木（樹冠使用 4 組材質以支援秋天混綠效果）
   const INS = [[-9.7, -7.2, 0.5], [1.9, 2.3, 0.6], [3.4, 2.3, 0.6], [4.9, 2.3, 0.6], [5.9, 6.3, 0.6], [6.7, 6.2, 0.6], [-8.6, -1, 1.3], [-7.15, -1.1, 1.7], [7.2, 7.3, 0.5], [0.4, -1.4, 1.1]];
-  const trees = [], crM = M(0x6ccb79), trM = M(0x9c6f4e);
+  const trees = [], crMs = [0, 1, 2, 3].map(() => M(0x6ccb79)), trM = M(0x9c6f4e);
   for (let n = 0, tr = 0, N = 4 + Math.floor(Math.random() * 4); n < N && tr < 400; tr++) {
     const a = rnd(0, PI * 2), d = Math.sqrt(Math.random()) * 9, x = Math.cos(a) * d, z = Math.sin(a) * d, sc0 = rnd(0.85, 1.3);
     if (x < -7.4 || z > 1.8 || (x > -5.8 && x < -0.2 && z > -4.4 && z < 0.8)) continue;
@@ -164,22 +164,21 @@
     g.position.set(x, 0, z);
     g.scale.setScalar(sc0);
     sc.add(g);
-    const th0 = rnd(1.3, 1.8), rm = rnd(0.9, 1.2);
+    const th0 = rnd(1.3, 1.8), rm = rnd(0.9, 1.2), ti = trees.length;
     add(new THREE.CylinderGeometry(0.18, 0.28, th0, 10), trM, 0, th0 / 2, 0, g);
     const cr = [
-      [0, th0 + 0.5, 0, rm],
-      [rnd(0.5, 0.8), th0 + rnd(0.1, 0.4), rnd(-0.4, 0.4), rm * rnd(0.6, 0.8)],
-      [-rnd(0.5, 0.8), th0 + rnd(0, 0.3), rnd(-0.4, 0.4), rm * rnd(0.6, 0.8)]
-    ].map(c => add(new THREE.SphereGeometry(c[3], 20, 16), crM, c[0], c[1], c[2], g));
+      [0, th0 + 0.5, 0, rm, ti % 2],
+      [rnd(0.5, 0.8), th0 + rnd(0.1, 0.4), rnd(-0.4, 0.4), rm * rnd(0.6, 0.8), (ti + 1) % 2 ? 2 : 3],
+      [-rnd(0.5, 0.8), th0 + rnd(0, 0.3), rnd(-0.4, 0.4), rm * rnd(0.6, 0.8), ti % 3 == 0 ? 2 : 0]
+    ].map(c => add(new THREE.SphereGeometry(c[3], 20, 16), crMs[c[4]], c[0], c[1], c[2], g));
     trees.push({ g, cr, ph: rnd(0, 6), th: th0 });
     n++;
   }
 
-  // 樹木四季：枝條、葉片、果實、落葉
+  // 樹木四季：枝條、果實、飄落葉與地面落葉
   const ell = (rx, ry) => { const g = new THREE.CircleGeometry(1, 14); g.scale(rx, ry, 1); return g; };
-  const lfG = ell(0.1, 0.13);
   const lfM = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, side: THREE.DoubleSide });
-  const Dm = new THREE.Object3D(), Vz = new THREE.Vector3(0, 0, 1), Vy = new THREE.Vector3(0, 1, 0), brM = M(0x7a5f4a);
+  const Dm = new THREE.Object3D(), Vy = new THREE.Vector3(0, 1, 0), brM = M(0x7a5f4a);
   const frM = [M(0xe8413c, { roughness: 0.5 }), M(0xf79a3a, { roughness: 0.5 })];
 
   trees.forEach(t => {
@@ -202,11 +201,6 @@
       w2.castShadow = true;
       t.g.add(w2);
     }
-    t.leaf = new THREE.InstancedMesh(lfG, lfM, 110);
-    t.leaf.setColorAt(0, new THREE.Color(0xffffff));
-    t.leaf.castShadow = true;
-    t.leaf.count = 0;
-    t.g.add(t.leaf);
     t.fr = [];
     for (let i = 0; i < 8; i++) {
       const f = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), frM[i % 2]);
@@ -270,28 +264,12 @@
   }
 
   function treeSeason(se) {
-    const cf = LC[se], cs = CS[se];
+    const cs = CS[se];
     const fp = FALLC[se];
     for (let i = 0; i < NFALL; i++) fall.setColorAt(i, tmp.set(fp[i % fp.length]));
     fall.instanceColor.needsUpdate = true;
 
     trees.forEach(t => {
-      const im = t.leaf;
-      im.count = cf.n;
-      for (let i = 0; i < cf.n; i++) {
-        const c = t.cr[Math.floor(Math.random() * t.cr.length)];
-        const rad = c.geometry.parameters.radius * cs;
-        const d = new THREE.Vector3(rnd(-1, 1), rnd(-0.4, 1), rnd(-1, 1)).normalize();
-        Dm.position.copy(c.position).addScaledVector(d, rad * rnd(0.92, 1.08));
-        Dm.quaternion.setFromUnitVectors(Vz, d);
-        Dm.rotateZ(rnd(0, PI * 2));
-        Dm.scale.setScalar(cf.z * rnd(0.8, 1.2));
-        Dm.updateMatrix();
-        im.setMatrixAt(i, Dm.matrix);
-        im.setColorAt(i, tmp.set(cf.c[i % cf.c.length]));
-      }
-      im.instanceMatrix.needsUpdate = true;
-      if (im.instanceColor) im.instanceColor.needsUpdate = true;
       t.fr.forEach(f => {
         f.visible = se == 'summer';
         if (f.visible) {
@@ -333,16 +311,26 @@
     else tuft.push(add(new THREE.ConeGeometry(0.12, 0.35, 6), M(0x86d36f), x, 0.17, z));
   }
 
-  // 障礙物與空地判定
+  // 障礙物與可行走區域判定（含愛河小橋與南岸草地）
   const OBS = INS.concat(trees.map(t => [t.g.position.x, t.g.position.z, 0.7 * t.g.scale.x]));
   const free = (x, z, r) => {
-    if (x * x + z * z > 9.4 * 9.4 || x - r < -9.2 || (z + r > 7.55 && Math.abs(x) > 0.95)) return false;
+    if (Math.abs(x) <= Math.max(0.25, 0.8 - r * 0.65) && z > 7.55 - r && z < 10.55) return true;
+    if (z >= 9.8 + r * 0.4 && x * x + z * z <= (10.8 - r * 0.5) ** 2 && (z >= 10.25 || Math.abs(x) >= 0.85 + r * 0.4)) return true;
+    if (x * x + z * z > 9.4 * 9.4 || x - r < -9.2 || z + r > 7.55) return false;
     if (x > -5.3 - r && x < -0.7 + r && z > -3.9 - r && z < 0.2 + r) return false;
     return OBS.every(o => Math.hypot(x - o[0], z - o[1]) > o[2] + r);
   };
   const pick = r => {
     for (let i = 0; i < 60; i++) {
-      const a = rnd(0, PI * 2), d = Math.sqrt(Math.random()) * 9, x = Math.cos(a) * d, z = Math.sin(a) * d;
+      let x, z;
+      if (Math.random() < 0.14) {
+        x = rnd(-3.5, 3.5);
+        z = rnd(9.8, 10.65);
+      } else {
+        const a = rnd(0, PI * 2), d = Math.sqrt(Math.random()) * 9;
+        x = Math.cos(a) * d;
+        z = Math.sin(a) * d;
+      }
       if (free(x, z, r)) return [x, z];
     }
     return [0, 5];
@@ -370,27 +358,51 @@
     return { pl, hd, gl };
   });
 
-  // 長草叢
-  const gTone = [0.8, 0.9, 1].map(f => ({ f, m: M(0x86d36f, { side: THREE.DoubleSide }) }));
+  // 長草叢（單一 InstancedMesh，關閉 castShadow，支援季節混色）
+  const grassMat = M(0xffffff, { side: THREE.DoubleSide });
   const bladeG = new THREE.ConeGeometry(0.06, 1, 4);
   bladeG.translate(0, 0.5, 0);
-  const clumps = [];
+  const blades = [], clumps = [];
+
   for (let n = 0, tr = 0, N = 12 + Math.floor(Math.random() * 6); n < N && tr < 500; tr++) {
     const p = pick(0.9);
     if (p[1] > 2.1 && p[1] < 6.3) continue;
     if (clumps.some(c => Math.hypot(c.x - p[0], c.z - p[1]) < 1.7)) continue;
     const bl = [], cnt = 24 + Math.floor(Math.random() * 16);
     for (let i = 0; i < cnt; i++) {
-      const a = rnd(0, PI * 2), r = Math.random() * 0.6, m = new THREE.Mesh(bladeG, gTone[i % 3].m);
-      m.position.set(p[0] + Math.cos(a) * r, 0, p[1] + Math.sin(a) * r);
-      m.scale.set(1, rnd(0.55, 0.9) * (1 - r * 0.35), 1);
-      m.castShadow = true;
-      sc.add(m);
-      bl.push({ m, ph: rnd(0, 6), s: rnd(0.75, 1.25) });
+      const a = rnd(0, PI * 2), r = Math.random() * 0.6;
+      const b = {
+        idx: blades.length,
+        x: p[0] + Math.cos(a) * r,
+        z: p[1] + Math.sin(a) * r,
+        h: rnd(0.55, 0.9) * (1 - r * 0.35),
+        ph: rnd(0, 6),
+        s: rnd(0.75, 1.25),
+        tone: [0.8, 0.9, 1][i % 3],
+        mix: Math.random()
+      };
+      blades.push(b);
+      bl.push(b);
     }
     clumps.push({ x: p[0], z: p[1], bl });
     n++;
   }
+
+  const grassInst = new THREE.InstancedMesh(bladeG, grassMat, Math.max(1, blades.length));
+  grassInst.count = blades.length;
+  grassInst.castShadow = false;
+  grassInst.frustumCulled = false;
+  blades.forEach((b, i) => {
+    Dm.position.set(b.x, 0, b.z);
+    Dm.rotation.set(0, 0, 0);
+    Dm.scale.set(1, b.h, 1);
+    Dm.updateMatrix();
+    grassInst.setMatrixAt(i, Dm.matrix);
+    grassInst.setColorAt(i, tmp.setRGB(b.tone, b.tone, b.tone));
+  });
+  grassInst.instanceMatrix.needsUpdate = true;
+  if (grassInst.instanceColor) grassInst.instanceColor.needsUpdate = true;
+  sc.add(grassInst);
 
   App.onNightUpdate((dt, w, LV) => {
     lamps.forEach(l => {
@@ -401,7 +413,7 @@
     });
   });
 
-  let pSeason = '';
+  let pSeason = '', pGrassKey = '';
 
   App.renderer = R;
   App.cv = R.domElement;
@@ -439,11 +451,42 @@
       }
 
       gM.color.set(GR[season]).lerp(tmp.set(0xf4f8fb), snowF * 0.85);
-      tuft.forEach(f => f.material.color.copy(gM.color).multiplyScalar(0.9));
       gMs.color.copy(gM.color);
       trM.color.set(TR[season]);
-      crM.color.set(CR[season]).lerp(tmp.set(0xffffff), w.s ? 0.8 : 0);
+
+      const crPal = Array.isArray(CR[season]) ? CR[season] : [CR[season], CR[season], CR[season], CR[season]];
+      crMs.forEach((m, i) => m.color.set(crPal[i]).lerp(tmp.set(0xffffff), w.s ? 0.8 : 0));
       roofM.color.set(0xf5a39b).lerp(tmp.set(0xffffff), snowF * 0.9);
+
+      const grassKey = season + '|' + snowF;
+      if (grassKey != pGrassKey) {
+        pGrassKey = grassKey;
+        const cDry = new THREE.Color(0xc7ad6e);
+        const cAutG1 = new THREE.Color(0x9ec45a);
+        const cAutG2 = new THREE.Color(0xb5cb5e);
+        const cSnow = new THREE.Color(0xf4f8fb);
+
+        tuft.forEach((f, i) => {
+          f.material.color.copy(gM.color);
+          if (season == 'autumn' && i % 5 < 2) f.material.color.copy(i % 2 ? cAutG1 : cAutG2).lerp(cSnow, snowF * 0.85);
+          else if (season == 'winter' && i % 3 == 0) f.material.color.lerp(cDry, 0.45 * (1 - snowF * 0.85));
+          f.material.color.multiplyScalar(0.9);
+        });
+
+        if (blades.length) {
+          blades.forEach((b, i) => {
+            const col = new THREE.Color().copy(gM.color);
+            if (season == 'autumn' && b.mix < 0.45) {
+              col.copy(b.mix < 0.22 ? cAutG1 : cAutG2).lerp(cSnow, snowF * 0.85);
+            } else if (season == 'winter' && b.mix < 0.45) {
+              col.lerp(cDry, 0.5 * (1 - snowF * 0.85));
+            }
+            col.multiplyScalar(b.tone);
+            grassInst.setColorAt(i, col);
+          });
+          if (grassInst.instanceColor) grassInst.instanceColor.needsUpdate = true;
+        }
+      }
 
       rM.color.set(0xd8cfc5).lerp(tmp.set(0x8f95a3), wet).lerp(tmp.set(0xf2f6fa), snowF * 0.9);
       rM.roughness = 0.95 - 0.7 * wet;
@@ -461,17 +504,22 @@
 
       fallUpdate(dt, wd, dx, dz, FALLN[season]);
 
-      gTone.forEach(t => t.m.color.copy(gM.color).multiplyScalar(t.f));
-      const ls = cl(wd / 40, 0, 1), lean = 0.06 + ls * 0.75, fr = 1.3 + wd * 0.12;
-      clumps.forEach(c => {
-        if (c.sk > 0) c.sk = Math.max(0, c.sk - dt * 0.7);
-        c.bl.forEach(b => {
-          const A = lean * b.s + Math.sin(tm * fr + b.ph + c.x * 0.4) * (0.05 + ls * 0.22) + (c.sk || 0) * Math.sin(tm * 22 + b.ph) * 0.35;
-          const P = Math.sin(tm * fr * 0.7 + b.ph * 2) * (0.03 + ls * 0.06);
-          b.m.rotation.x = A * dz + P * dx;
-          b.m.rotation.z = -(A * dx - P * dz);
+      if (blades.length) {
+        const ls = cl(wd / 40, 0, 1), lean = 0.06 + ls * 0.75, fr = 1.3 + wd * 0.12;
+        clumps.forEach(c => {
+          if (c.sk > 0) c.sk = Math.max(0, c.sk - dt * 0.7);
+          c.bl.forEach(b => {
+            const A = lean * b.s + Math.sin(tm * fr + b.ph + c.x * 0.4) * (0.05 + ls * 0.22) + (c.sk || 0) * Math.sin(tm * 22 + b.ph) * 0.35;
+            const P = Math.sin(tm * fr * 0.7 + b.ph * 2) * (0.03 + ls * 0.06);
+            Dm.position.set(b.x, 0, b.z);
+            Dm.rotation.set(A * dz + P * dx, 0, -(A * dx - P * dz));
+            Dm.scale.set(1, b.h, 1);
+            Dm.updateMatrix();
+            grassInst.setMatrixAt(b.idx, Dm.matrix);
+          });
         });
-      });
+        grassInst.instanceMatrix.needsUpdate = true;
+      }
     }
   };
 })(window.TownApp);

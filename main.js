@@ -59,7 +59,7 @@
     const atm = atmosphere.update(dt, w);
 
     // 2. 地景、季節樹木與草叢
-    const snowF = w.s ? 1 : season == 'winter' ? 0.55 : 0;
+    const snowF = w.s ? 1 : 0;
     const wet = cl(Math.max(S.precip / 2, w.r ? 0.8 : 0), 0, 1);
     stage.update(dt, w, season, snowF, wet, atm.light, atm.gray, atm.wd, atm.dx, atm.dz);
 

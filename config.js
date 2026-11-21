@@ -50,17 +50,16 @@
     SN: { spring: '春', summer: '夏', autumn: '秋', winter: '冬' },
 
     // 四季配色與樹木參數
-    GR: { spring: 0xb7e39a, summer: 0x86d36f, autumn: 0xe3c76d, winter: 0xdfe9ee },
-    CR: { spring: 0xb6e388, summer: 0x2f8f4e, autumn: 0xf2b134, winter: 0xf3f7fa },
+GR: { spring: 0xb7e39a, summer: 0x86d36f, autumn: 0xe3c76d, winter: 0xd8c284 },
+    CR: {
+      spring: [0xb6e388, 0xaee07e, 0xc0e894, 0xa5d976],
+      summer: [0x2f8f4e, 0x2a8448, 0x369a56, 0x267841],
+      autumn: [0xf2b134, 0xea9332, 0xa6be4b, 0x64a34c],
+      winter: [0xf3f7fa, 0xf3f7fa, 0xf3f7fa, 0xf3f7fa]
+    },
     FL: { spring: [0xff9fc0, 0xffffff, 0xffe27a], summer: [0xffd84d, 0xff8a8a], autumn: [0xe8864a], winter: [] },
     CS: { spring: 0.78, summer: 1.05, autumn: 0.95, winter: 0.01 },
     TR: { spring: 0x9c6f4e, summer: 0x8a5f40, autumn: 0x8a6347, winter: 0x6f5a4c },
-    LC: {
-      spring: { n: 0, z: 0.9, c: [0xb9ee8a, 0xa6e07a, 0xcdf5a0] },
-      summer: { n: 0, z: 1.3, c: [0x1f6e3c, 0x2a8048, 0x17592f] },
-      autumn: { n: 0, z: 1.1, c: [0xf2b134, 0xf28c1f, 0xd63a2b] },
-      winter: { n: 0, z: 1, c: [0x8c5a2b] }
-    },
     AUT: [0xf2b134, 0xf28c1f, 0xd63a2b],
     WIN: [0x6f4e37, 0x5c4033, 0x8b5a2b, 0x7a5230],
     FALLC: {
