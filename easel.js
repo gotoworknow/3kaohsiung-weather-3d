@@ -2,8 +2,26 @@
   const { $, PI, runtime } = App;
   const { sc, M, add } = App;
 
-  // 畫架擺放位置（小屋東側草地，避開房屋、狗窩與布告欄）
-  const EX = 4.8, EZ = -1.4, E_RADIUS = 1.15;
+// 隨機挑選北側草地空位（避開港口、馬路、屋門口、樹木與長草叢）
+  const E_RADIUS = 1.15;
+  function pickEaselSpot() {
+    const clumps = (App.stage && App.stage.clumps) || [];
+    for (let pass = 0; pass < 2; pass++) {
+      const minClump = pass === 0 ? 1.4 : 0.7;
+      for (let i = 0; i < 200; i++) {
+        const a = App.rnd(0, PI * 2), d = Math.sqrt(Math.random()) * 8.2;
+        const x = Math.cos(a) * d, z = Math.sin(a) * d;
+        if (x < -6.8 || z > 1.6) continue;
+        if (Math.hypot(x + 3.9, z - 0.75) < 1.8) continue; // 保留小屋門口動線
+        if (!App.free(x, z, E_RADIUS)) continue;
+        if (clumps.some(c => Math.hypot(x - c.x, z - c.z) < minClump)) continue;
+        return [x, z];
+      }
+    }
+    return [4.8, -1.4];
+  }
+
+  const [EX, EZ] = pickEaselSpot();
   if (typeof App.addObstacle === 'function') App.addObstacle(EX, EZ, E_RADIUS);
 
   const PRIMARY_BASE = 'https://willow-god.github.io/daily-image/';
@@ -12,7 +30,8 @@
   // ========== 3D 木質三腳畫架模型 ==========
   const easelGrp = new THREE.Group();
   easelGrp.position.set(EX, 0, EZ);
-  easelGrp.rotation.y = 0.25;
+  // 朝向前方廣場與主視角方向，帶一點自然隨機偏角
+  easelGrp.rotation.y = Math.atan2(2 - EX, 9 - EZ) + App.rnd(-0.45, 0.45);
   sc.add(easelGrp);
 
   const wood = M(0xb98a5a);
