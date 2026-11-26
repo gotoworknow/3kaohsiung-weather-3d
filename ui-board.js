@@ -208,18 +208,34 @@
     chart.update('none');
   }
 
-  // 3D 布告欄點擊偵測
+// 3D 物件點擊偵測（布告欄 + 每日一圖畫架）
   const ray = new THREE.Raycaster(), mv2 = new THREE.Vector2();
   let pd = null;
-  const hitBoard = e => {
+  const isChildOf = (obj, root) => {
+    for (let p = obj; p; p = p.parent) if (p === root) return true;
+    return false;
+  };
+  const hitTarget = e => {
     mv2.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
     ray.setFromCamera(mv2, cam);
-    return ray.intersectObjects([bGrp, waterfront.harborBoard], true).length > 0;
+    const targets = [bGrp, waterfront.harborBoard];
+    if (App.easel && App.easel.group) targets.push(App.easel.group);
+    const hits = ray.intersectObjects(targets, true);
+    if (!hits.length) return null;
+    if (App.easel && App.easel.group && isChildOf(hits[0].object, App.easel.group)) return 'easel';
+    return 'board';
   };
   cv.addEventListener('pointerdown', e => { pd = [e.clientX, e.clientY]; });
-  cv.addEventListener('pointerup', e => { if (pd && Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) < 6 && hitBoard(e)) openBB(); pd = null; });
-  cv.addEventListener('pointermove', e => { if (!runtime.dg) cv.style.cursor = hitBoard(e) ? 'pointer' : ''; });
-
+  cv.addEventListener('pointerup', e => {
+    if (pd && Math.hypot(e.clientX - pd[0], e.clientY - pd[1]) < 6) {
+      const t = hitTarget(e);
+      if (t === 'easel') App.easel.openModal();
+      else if (t === 'board') openBB();
+    }
+    pd = null;
+  });
+  cv.addEventListener('pointermove', e => { if (!runtime.dg) cv.style.cursor = hitTarget(e) ? 'pointer' : ''; });
+  
   App.onSyncUI(sync);
 
   App.ui = {

@@ -88,6 +88,30 @@
     </div>
   </section>
 
+  <!-- 每日一圖賞析彈出視窗 -->
+  <div id="easel-modal" role="dialog" aria-modal="true" aria-labelledby="easel-modal-title">
+    <div id="easel-card">
+      <div class="easel-head">
+        <span>🎨 每日一圖賞析</span>
+        <button id="easel-modal-close" title="關閉">✕</button>
+      </div>
+      <div id="easel-img-wrap">
+        <img id="easel-modal-img" alt="每日一圖">
+      </div>
+      <div id="easel-modal-date"></div>
+      <div id="easel-modal-title"></div>
+      <div id="easel-modal-copyright"></div>
+      <div class="easel-actions">
+        <button id="easel-prev">◀ 前一天</button>
+        <select id="easel-date-select"></select>
+        <button id="easel-next">後一天 ▶</button>
+        <button id="easel-random">🎲 隨機一日</button>
+        <button id="easel-today">☀ 今日</button>
+      </div>
+      <div class="easel-note">圖源：willow-god/daily-image（Bing 每日桌布，僅供個人學習展示）</div>
+    </div>
+  </div>
+
   <!-- 外部函式庫 -->
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -99,6 +123,7 @@
 
   <!-- 2. 3D 場景與自然環境 -->
   <script defer src="stage-base.js"></script>
+  <script defer src="easel.js"></script>
   <script defer src="atmosphere.js"></script>
   <script defer src="waterfront.js"></script>
   <script defer src="living-world.js"></script>

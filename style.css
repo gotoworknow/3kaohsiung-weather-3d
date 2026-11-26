@@ -238,3 +238,100 @@ select {
     width: 260px;
   }
 }
+
+/* 每日一圖賞析彈出視窗 */
+#easel-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(65, 50, 42, .45);
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+#easel-modal.is-open {
+  display: flex;
+}
+
+#easel-card {
+  width: min(680px, 95vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: #fff7e6;
+  border: 6px solid #c89b6d;
+  border-radius: 16px;
+  padding: 12px 14px 14px;
+  box-shadow: 0 12px 36px rgba(60, 40, 25, .35);
+  box-sizing: border-box;
+}
+
+.easel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+#easel-img-wrap {
+  background: #f2e4cc;
+  border-radius: 10px;
+  padding: 6px;
+  text-align: center;
+}
+
+#easel-modal-img {
+  display: block;
+  width: 100%;
+  max-height: 54vh;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+#easel-modal-date {
+  font-size: 12px;
+  color: #8a7a6e;
+  margin-top: 8px;
+}
+
+#easel-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5a4a42;
+  margin: 3px 0;
+}
+
+#easel-modal-copyright {
+  font-size: 12px;
+  opacity: .8;
+  margin-bottom: 10px;
+}
+
+.easel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.easel-actions select {
+  width: auto;
+  flex: 1;
+  min-width: 135px;
+}
+
+.easel-actions button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.easel-note {
+  font-size: 11px;
+  opacity: .65;
+  margin-top: 8px;
+  text-align: right;
+}
